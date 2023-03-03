@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 const port = process.env.PORT | 5000;
@@ -28,6 +28,21 @@ async function run() {
       const cursor = todosCollection.find(query);
       const allTodo = await cursor.toArray();
       res.send(allTodo);
+
+      //Post todo
+      app.post("/todos", async (req, res) => {
+        const newTodo = req.body;
+        const addTodo = await todosCollection.insertOne(newTodo);
+        res.send(addTodo);
+      });
+      //delete todo
+      app.delete("/todo/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+
+        const deleteTodo = await todosCollection.deleteOne(query);
+        res.send(deleteTodo);
+      });
     });
   } finally {
   }
